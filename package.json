@@ -1,0 +1,11 @@
+{
+  "name": "smarting_server",
+  "version": "1.0.0",
+  "description": "smarting IoT server",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "zzanzu",
+  "license": "ISC"
+}
