@@ -151,4 +151,48 @@ router.post('/trash', function(req, res) {
   });
 });
 
+router.get('/motion_detect', function(req, res) {
+  res.json({result: 1});
+});
+
+router.post('/motion_detect', function(req, res) {
+  console.log(req.body);
+  res.send('');
+  var motionless_time = req.body.motionless_time;
+
+  // HTTP request options
+  var options = {
+      method: "POST",
+      uri:"http://fcm.googleapis.com/fcm/send",
+      headers: {
+        "authorization": conf.fcmauth
+      },
+      body: {
+        "to" : conf.fcmkey,
+        "content_available": true,
+        "notification": {
+          "title": "Smarting",
+          "body": req.body.motionless_time,
+          "click_action": "fcm.ACTION_HELLO",
+        },
+        "data": {
+            "motion": 1,
+            "time": (new Date())
+        }
+      },
+      json: true
+  }
+
+  // execute POST request
+  request(options)
+    .then(function (parsedBody) {
+      console.log(motionless_time)
+      console.log('POST Succeeded');
+    })
+    .catch(function (err) {
+      console.log('POST failed');
+    }
+  );
+});
+
 module.exports = router;
