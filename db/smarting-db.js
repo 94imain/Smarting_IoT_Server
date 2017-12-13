@@ -5,7 +5,9 @@ var Schema = mongoose.Schema;
 // doorbell schema, model
 var doorbellSchema = new Schema({
   ispressed: Boolean,
-  date: { type: Date, default: Date.now }
+  date: { type: Date, default: Date.now },
+  visitor: String,
+  accuracy: String
 });
 doorbellSchema.set('toJSON', { getters: true, virtuals: false });
 

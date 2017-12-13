@@ -6,6 +6,7 @@ var BodyParser = require('body-parser')
 var request = require('request-promise');
 var router = express.Router();
 var smarting_db = require('../db/smarting-db.js');
+var isodate = require('isodate'); // for doorbell's isodate type
 
 router.use(BodyParser.json()); // for parsing application/json
 router.use(BodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded, 이거 안하면 json이 undefined로 뜸
@@ -21,7 +22,7 @@ router.get('/ispressed', function(req, res) {
   // getting latest data(test)
   smarting_db.Doorbell.findOne({}, {}, { sort: { 'date' : -1 } },function(err, post) {
     // console.log(post);
-    res.json(post.date);
+    res.json({date: post.date, visitor: post.visitor});
   });
 });
 
@@ -29,14 +30,22 @@ router.get('/ispressed', function(req, res) {
 router.post('/ispressed', function(req, res) {
   console.log(req.body.ispressed);
   console.log(req.body.time);
+  console.log(req.body.visitor);
+  console.log(req.body.accuracy + "%");
 
+  // 이 변수들을 왜 선언했더라?;;
   var ispressedData = req.body.ispressed;
   var timeData = req.body.time;
+  var visitorData = req.body.visitor;
+  var accuracyData = req.body.accuracy;
 
   // MongoDB
   var doorbell = new smarting_db.Doorbell();
   doorbell.ispressed = req.body.ispressed;
   doorbell.date = req.body.time;
+  // doorbell.date = timeData.toISOString();
+  doorbell.visitor = req.body.visitor;
+  doorbell.accuracy = req.body.accuracy;
 
   // FCM push notification
   if(req.body.ispressed == 1) {
@@ -51,19 +60,21 @@ router.post('/ispressed', function(req, res) {
         	"to" : conf.fcmkey,
         	"content_available": true,
         	"notification": {
-        		"title": "Smarting",
-        		"body": "doorbell pressed!",
+        		"title": "New Visitor",
+        		"body": "At Front Door",
         		"click_action": "fcm.ACTION_HELLO",
         	},
         	"data": {
             	"ispressed": 1,
-            	"time": (new Date())
+            	"time": (new Date()),
+              "visitor": visitorData,
+              "accuracy": accuracyData
         	}
         },
         json: true
     }
 
-    // execute POST request
+    // execute POST request to FCM server
     request(options)
       .then(function (parsedBody) {
         console.log('POST Succeeded');

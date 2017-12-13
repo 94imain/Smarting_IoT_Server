@@ -1,8 +1,9 @@
 var fs = require('fs');
 var data = fs.readFileSync('conf.json', 'utf-8');
 var conf = JSON.parse(data);
-
-var app = require('express')();
+var express = require('express');
+var app = express();
+var path = require('path');
 
 // Routing
 var route = require('./routes/route.js');
@@ -23,6 +24,7 @@ var promise = mongoose.connect('mongodb://localhost/mongodb_smarting', {
 });
 
 app.use('/', route);
+app.use('/swagger-ui', express.static(path.join(__dirname, './node_modules/swagger-ui/dist')));
 
 app.listen(7579, () => {
   console.log('Start server using the port 7579...');
