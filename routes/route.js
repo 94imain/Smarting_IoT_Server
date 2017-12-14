@@ -134,7 +134,7 @@ router.post('/temperature', function(req, res) {
 router.get('/trash', function(req, res) {
   smarting_db.Trash.findOne({}, {}, { sort: { 'time' : -1 } },function(err, post) {
     // console.log(post);
-    res.json(post.percentage);
+    res.json({time:post.time, percentage:post.percentage});
   });
 });
 
